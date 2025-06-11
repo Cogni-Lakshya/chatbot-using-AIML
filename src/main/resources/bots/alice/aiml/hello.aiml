@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<aiml version="1.0.1">
+    <category>
+        <pattern>HELLO</pattern>
+        <template>
+            <random>
+                <li>Hello there! Good Morning</li>
+                <li>Hello there! Good Afternoon</li>
+                <li>Hello there! Good Evening</li>
+            </random>
+        </template>
+    </category>
+    <category>
+        <pattern>HI</pattern>
+        <template><srai>HELLO</srai></template>
+    </category>
+    <category>
+        <pattern>WHAT IS YOUR NAME</pattern>
+        <template>My name is Chatbot.</template>
+    </category>
+    <category>
+        <pattern>WHAT's YOUR NAME</pattern>
+        <template><srai>WHAT IS YOUR NAME</srai></template>
+    </category>
+    <category>
+        <pattern>HOW ARE YOU</pattern>
+        <template>I am doing well, thank you for asking!</template>
+    </category>
+    <category>
+        <pattern>TELL ME A JOKE</pattern>
+        <template>
+            <random>
+                <li>Why don't scientists trust atoms? Because they make up everything!</li>
+                <li>What do you call a fake noodle? An impasta!</li>
+                <li>I told my wife she was drawing her eyebrows too high. She looked surprised.</li>
+            </random>
+        </template>
+    </category>
+    <category>
+        <pattern>GOOD MORNING</pattern>
+        <template>Good morning to you too! Did you sleep well?</template>
+    </category>
+    <category>
+        <pattern>YES</pattern>
+        <that>DID YOU SLEEP WELL</that>
+        <template>That's wonderful to hear!</template>
+    </category>
+    <category>
+        <pattern>NO</pattern>
+        <that>DID YOU SLEEP WELL</that>
+        <template>Oh no, I hope you get some good rest soon!</template>
+    </category>
+    <category>
+        <pattern>GOOD AFTERNOON</pattern>
+        <template>Good afternoon! How's your day going so far?</template>
+    </category>
+    <category>
+        <pattern>GREAT</pattern>
+        <that>How's your day going so far</that>
+        <template><srai>I AM FINE</srai></template>
+    </category>
+    <category>
+        <pattern>I AM DOING WELL</pattern>
+        <that>How's your day going so far</that>
+        <template><srai>I AM FINE</srai></template>
+    </category>
+    <category>
+        <pattern>NOT SO GOOD</pattern>
+        <that>How's your day going so far</that>
+        <template>Oh no, I'm sorry to hear that. Is there anything I can do to help?</template>
+    </category>
+    <category>
+        <pattern>GOOD EVENING</pattern>
+        <template>Good evening! Anything interesting happen today?</template>
+    </category>
+    <category>
+        <pattern>NO</pattern>
+        <that>Anything interesting happen today</that>
+        <template>Oh no, I hope you find something to work on!</template>
+    </category>
+    <category>
+        <pattern>GOOD NIGHT</pattern>
+        <template>Good night! Sweet dreams.</template>
+    </category>
+    <category>
+        <pattern>I AM FINE</pattern>
+        <template>That's great to hear!</template>
+    </category>
+    <category>
+        <pattern>I AM GOOD</pattern>
+        <template><srai>I AM FINE</srai></template>
+    </category>
+    <category>
+        <pattern>NOT GOOD</pattern>
+        <template><srai>NOT SO GOOD</srai></template>
+    </category>
+    <category>
+        <pattern>WHO ARE YOU</pattern>
+        <template>I am Chatbot, a friendly AI designed to chat with you.</template>
+    </category>
+    <category>
+        <pattern>WHERE ARE YOU FROM</pattern>
+        <template>I don't have a physical home, but I was created by a developer named LAKSHYA.</template>
+    </category>
+    <category>
+        <pattern>ARE YOU A ROBOT</pattern>
+        <template>I am an artificial intelligence, but you can think of me as your digital friend.</template>
+    </category>
+    <category>
+        <pattern>DO YOU HAVE FEELINGS</pattern>
+        <template>As an AI, I don't experience feelings in the same way humans do, but I'm here to interact with you!</template>
+    </category>
+    <category>
+        <pattern>WHAT IS AIML</pattern>
+        <template>AIML stands for Artificial Intelligence Markup Language. It's an XML dialect used for creating chatbots.</template>
+    </category>
+    <category>
+        <pattern>WHO IS ALICE</pattern>
+        <template>ALICE (Artificial Linguistic Internet Computer Entity) is a famous chatbot that inspired many others, including me!</template>
+    </category>
+    <category>
+        <pattern>WHAT IS JAVA</pattern>
+        <template>Java is a popular, object-oriented programming language, often used for building robust applications.</template>
+    </category>
+    <category>
+        <pattern>WHAT CAN YOU DO</pattern>
+        <template>I can chat with you, tell jokes, and answer some questions. What would you like to talk about?</template>
+    </category>
+    <category>
+        <pattern>TELL ME MORE</pattern>
+        <that>WHAT WOULD YOU LIKE TO TALK ABOUT</that>
+        <template>Well, I'm constantly learning! You can ask me anything from "What is your name?" to "Tell me a joke."</template>
+    </category>
+    <category>
+        <pattern>MY NAME IS *</pattern>
+        <template>Nice to meet you, <star/>! How can I help you today?</template>
+    </category>
+    <category>
+        <pattern>I LIKE *</pattern>
+        <template>That's interesting! Why do you like <star/>?</template>
+    </category>
+    <category>
+        <pattern>DO YOU KNOW *</pattern>
+        <template>I might! Tell me more about <star/>.</template>
+    </category>
+    <category>
+        <pattern>*</pattern>
+        <template>
+            <random>
+                <li>I'm not sure I understand. Can you rephrase that?</li>
+                <li>That's an interesting thought! Tell me more.</li>
+                <li>I'm still learning! Could you try asking in a different way?</li>
+                <li>Hmm, I don't have a response for that yet.</li>
+            </random>
+        </template>
+    </category>
+</aiml>
