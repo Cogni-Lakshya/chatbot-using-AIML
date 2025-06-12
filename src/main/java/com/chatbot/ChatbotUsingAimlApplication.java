@@ -14,8 +14,11 @@ public class ChatbotUsingAimlApplication {
 	public static final String RESOURCE_PATH = "src/main/resources"; // Path to your resources folder
 
 	public static void main(String[] args) {
-
 		SpringApplication.run(ChatbotUsingAimlApplication.class, args);
+//		callChatbot();
+	}
+
+	private static void callChatbot(){
 		try {
 			// Set trace mode for debugging (optional)
 			MagicBooleans.trace_mode = false;
