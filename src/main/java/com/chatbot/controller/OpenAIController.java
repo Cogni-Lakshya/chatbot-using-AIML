@@ -12,18 +12,17 @@ public class OpenAIController {
     @Autowired
     private OpenAIService openAIService;
 
-    @GetMapping("/askOpenAI/{question}")
+    @GetMapping("/ask_ollama/{question}")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public String askQuestion(@PathVariable("question") String question){
-        question = question.replaceAll("_", " ");
-        return openAIService.getAnswer(question);
+    public String getAnswerUsingOllama(@PathVariable("question") String question){
+        return openAIService.getAnswerUsingOllama(question);
     }
 
-    @GetMapping("/askOpenAI")
-    @ResponseStatus(HttpStatus.ACCEPTED)
-    public String askQuestion(){
-        return openAIService.getAnswerUsingOpenAI(null);
-    }
+//    @GetMapping("/ask_openai")
+//    @ResponseStatus(HttpStatus.ACCEPTED)
+//    public String askQuestion(){
+//        return openAIService.getAnswerUsingOpenAI(null);
+//    }
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
