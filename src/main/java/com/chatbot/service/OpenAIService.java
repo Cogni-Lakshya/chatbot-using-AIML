@@ -9,8 +9,11 @@ import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 @Service
@@ -25,15 +28,19 @@ public class OpenAIService{
         ChatResponse response = chatModel.call(prompt);
         AssistantMessage message = response.getResult().getOutput();
         return message.getText();
+
     }
 
     public Map<String, Object> getAnswerUsingOllamaJSON(String question){
-        String expectedJsonFormat = """
-            {
-                "summary": "<short summary>",
-                "keywords": ["<keyword1>", "<keyword2>"]
-            }
-            """;
+        String expectedJsonFormat = "";
+        try {
+            ClassPathResource resource = new ClassPathResource("aggregrate.json");
+            byte[] bytes = resource.getInputStream().readAllBytes();
+            expectedJsonFormat =  new String(bytes, StandardCharsets.UTF_8);
+            System.out.println("Expected JSON format: " + expectedJsonFormat);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to read aggregrate.json | ", e);
+        }
 
         // Construct the prompt for Ollama
         String promptString = """
@@ -44,8 +51,6 @@ public class OpenAIService{
 
             Text: %s
             """.formatted(expectedJsonFormat, question);
-//        PromptTemplate template = new PromptTemplate(promptString);
-//        Prompt prompt = template.create();
         ChatResponse response = chatModel.call(new Prompt(new UserMessage(promptString)));
         AssistantMessage message = response.getResult().getOutput();
         String messageText = message.getText()

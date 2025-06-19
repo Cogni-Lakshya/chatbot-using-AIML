@@ -1,0 +1,36 @@
+{
+    "jobConfiguration": {
+        "jobName": "aggregrate_test",
+        "jobDescription": "Job for R4b file name aggregrate",
+        "areJobAlertsSuppressed": false,
+        "exchangeTeamId": "fd23s-382d-2830-980983c00f",
+        "summary": "<short summary>",
+        "keywords": ["<keyword1>", "<keyword2>"]
+    },
+    "dataset": {
+        "catalogDatasetId": "b309800a-aj28-8w24-98987f0809",
+        "catalogDataRevisionNumber": 1,
+        "datasetPrimaryKeyFieldName": "wcis_cust_id_party",
+        "s3FolderFormat": "/instnc_id={yyyy}{MM}{dd}",
+        "dataSetLocations": [
+            {
+                "location": "s3://commbank/src",
+                "region": "east",
+                "priority": "1"
+            }
+        ],
+        "tableSrcOptions": null,
+        "isDataSetPrimaryKeyNullable": true,
+        "isDataSetActive": true
+    },
+    "ruleset": {
+        "rulesetName": "aggregrate_rule_set",
+        "rulesList": [
+            {
+                "ruleName": "ownership_change",
+                "description": "percentage of ownership change",
+                "ruleType": "real_range"
+            }
+        ]
+    }
+}
