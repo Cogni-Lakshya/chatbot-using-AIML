@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Ollama Chat Demo</title>
+    <style>
+        body {
+            background: #e9eef6;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+        }
+        .chat-container {
+            max-width: 480px;
+            margin: 40px auto;
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+            display: flex;
+            flex-direction: column;
+            height: 80vh;
+        }
+        .chat-header {
+            padding: 18px 18px 10px 18px;
+            background: #1976d2;
+            color: #fff;
+            border-radius: 14px 14px 0 0;
+            text-align: center;
+            font-size: 1.3em;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+        .header-title {
+            flex: 1;
+            text-align: left;
+        }
+        .history-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .history-btn {
+            background: #fff;
+            color: #1976d2;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 14px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .history-btn:hover {
+            background: #e3f2fd;
+        }
+        .history-list {
+            display: none;
+            position: absolute;
+            background: #fff;
+            width: max-content;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+            z-index: 10; /* increased for overlay */
+            left: 0;
+            right: auto;
+            top: 110%;
+            border-radius: 8px;
+            overflow: hidden;
+            max-height: 220px;
+            overflow-y: auto;
+        }
+        .history-item {
+            color: #1976d2;
+            padding: 12px 18px;
+            cursor: pointer;
+            border-bottom: 1px solid #e3f2fd;
+            background: #fff;
+            font-size: 0.98em;
+            transition: background 0.2s;
+            white-space: nowrap;
+        }
+        .history-item:last-child {
+            border-bottom: none;
+        }
+        .history-item:hover {
+            background: #e3f2fd;
+        }
+        .show {
+            display: block;
+        }
+        .save-btn {
+            background: #fff;
+            color: #1976d2;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 14px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .save-btn:hover {
+            background: #e3f2fd;
+        }
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            background: #f4f7fa;
+        }
+        .message {
+            max-width: 75%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            font-size: 1.05em;
+            line-height: 1.5;
+            word-break: break-word;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+        }
+        .user {
+            align-self: flex-end;
+            background: #1976d2;
+            color: #fff;
+            border-bottom-right-radius: 4px;
+        }
+        .ollama {
+            align-self: flex-start;
+            background: #e3f2fd;
+            color: #1976d2;
+            border-bottom-left-radius: 4px;
+        }
+        .chat-input-area {
+            display: flex;
+            padding: 16px;
+            border-top: 1px solid #e0e0e0;
+            background: #fff;
+            border-radius: 0 0 14px 14px;
+        }
+        .chat-input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #cfd8dc;
+            border-radius: 6px;
+            font-size: 1em;
+            outline: none;
+        }
+        .send-btn {
+            background: #1976d2;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 0 22px;
+            margin-left: 10px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .send-btn:hover {
+            background: #1565c0;
+        }
+        @media (max-width: 600px) {
+            .chat-container {
+                margin: 0;
+                border-radius: 0;
+                height: 100vh;
+            }
+            .chat-header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+            }
+        }
+        .icon-btn {
+            background: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 6px 8px;
+            cursor: pointer;
+            position: relative;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .icon-btn:hover {
+            background: #e3f2fd;
+        }
+        .icon-btn svg {
+            display: block;
+        }
+        .tooltip {
+            visibility: hidden;
+            opacity: 0;
+            width: max-content;
+            background: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 4px;
+            padding: 4px 10px;
+            position: absolute;
+            z-index: 10;
+            bottom: -38px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.95em;
+            pointer-events: none;
+            transition: opacity 0.2s;
+            white-space: nowrap;
+        }
+        .icon-btn:hover .tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
+        .dot-anim {
+            display: inline-block;
+            font-size: 1.5em;
+            letter-spacing: 2px;
+        }
+        .dot-anim span {
+            display: inline-block;
+            width: 0.4em;
+            height: 0.4em;
+            margin: 0 0.1em;
+            background: #1976d2;
+            border-radius: 50%;
+            opacity: 0.4;
+            animation: dot-bounce 1.2s infinite;
+        }
+        .dot-anim span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        .dot-anim span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        @keyframes dot-bounce {
+            0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
+            40% { transform: translateY(-8px); opacity: 1; }
+        }
+        .modal-overlay {
+          position: fixed;
+          top: 0; left: 0; right: 0; bottom: 0;
+          background: rgba(0,0,0,0.18);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 100;
+        }
+        .modal-content {
+          background: #fff;
+          border-radius: 10px;
+          box-shadow: 0 4px 24px rgba(25,118,210,0.12);
+          padding: 28px 32px 20px 32px;
+          min-width: 320px;
+          display: flex;
+          flex-direction: column;
+          align-items: stretch;
+        }
+        .modal-content h3 {
+          margin: 0 0 12px 0;
+          color: #1976d2;
+          font-size: 1.1em;
+          font-weight: 600;
+        }
+        .modal-content input {
+          padding: 10px;
+          border: 1px solid #e3f2fd;
+          border-radius: 6px;
+          font-size: 1em;
+          margin-bottom: 18px;
+          outline: none;
+        }
+        .modal-actions {
+          display: flex;
+          justify-content: flex-end;
+          gap: 10px;
+        }
+        .modal-actions button {
+          background: #1976d2;
+          color: #fff;
+          border: none;
+          border-radius: 6px;
+          padding: 8px 18px;
+          font-size: 1em;
+          cursor: pointer;
+          transition: background 0.2s;
+        }
+        .modal-actions button#chatNameCancel {
+          background: #e3f2fd;
+          color: #1976d2;
+        }
+        .modal-actions button:hover {
+          background: #1565c0;
+        }
+        .modal-actions button#chatNameCancel:hover {
+          background: #bbdefb;
+        }
+    </style>
+    <script>
+        let currentChat = [];
+
+        async function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const question = input.value.trim();
+            if (!question) return;
+            appendMessage(question, 'user');
+            currentChat.push({ text: question, sender: 'user' });
+            input.value = '';
+            scrollToBottom();
+
+            // Add processing animation
+            const chat = document.getElementById('chatMessages');
+            const processingDiv = document.createElement('div');
+            processingDiv.className = 'message ollama';
+            processingDiv.id = 'processingMessage';
+            processingDiv.innerHTML = 'Processing <span class="dot-anim"><span></span><span></span><span></span></span>';
+            chat.appendChild(processingDiv);
+            scrollToBottom();
+
+            try {
+                const response = await fetch('/v1/ask_ollama/' + encodeURIComponent(question), {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const text = await response.text();
+                // Remove processing animation
+                processingDiv.remove();
+                appendMessage(text, 'ollama');
+                currentChat.push({ text: text, sender: 'ollama' });
+                scrollToBottom();
+            } catch (e) {
+                processingDiv.remove();
+                appendMessage('Error: Could not reach Ollama service.', 'ollama');
+                currentChat.push({ text: 'Error: Could not reach Ollama service.', sender: 'ollama' });
+                scrollToBottom();
+            }
+        }
+
+        function appendMessage(text, sender) {
+            const chat = document.getElementById('chatMessages');
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'message ' + sender;
+            msgDiv.innerText = text;
+            chat.appendChild(msgDiv);
+        }
+
+        function scrollToBottom() {
+            const chat = document.getElementById('chatMessages');
+            chat.scrollTop = chat.scrollHeight;
+        }
+
+        function showChatNameModal(onSave) {
+            const modal = document.getElementById('chatNameModal');
+            const input = document.getElementById('chatNameInput');
+            const saveBtn = document.getElementById('chatNameSave');
+            const cancelBtn = document.getElementById('chatNameCancel');
+            input.value = '';
+            modal.style.display = 'flex';
+            input.focus();
+
+            function close() {
+                modal.style.display = 'none';
+                saveBtn.onclick = null;
+                cancelBtn.onclick = null;
+            }
+
+            saveBtn.onclick = () => {
+                onSave(input.value.trim());
+                close();
+            };
+            cancelBtn.onclick = close;
+            input.onkeydown = (e) => {
+                if (e.key === 'Enter') {
+                    saveBtn.onclick();
+                }
+                if (e.key === 'Escape') {
+                    close();
+                }
+            };
+        }
+
+        function saveChat() {
+            if (currentChat.length === 0) return;
+            showChatNameModal(function(userName) {
+                const timestamp = new Date().toLocaleString();
+                const chatId = 'chat_' + Date.now();
+                const chatName = userName ? userName : 'Chat ' + timestamp;
+                const chatData = { id: chatId, name: chatName, messages: currentChat };
+                let history = JSON.parse(localStorage.getItem('ollama_chat_history') || '[]');
+                history.unshift(chatData);
+                localStorage.setItem('ollama_chat_history', JSON.stringify(history));
+                loadChatHistory();
+                alert('Chat saved!');
+            });
+        }
+
+        function loadChatHistory() {
+            const history = JSON.parse(localStorage.getItem('ollama_chat_history') || '[]');
+            const list = document.getElementById('historyList');
+            list.innerHTML = '';
+            if (history.length === 0) {
+                const empty = document.createElement('div');
+                empty.className = 'history-item';
+                empty.innerText = 'No saved chats';
+                empty.style.color = '#aaa';
+                empty.style.cursor = 'default';
+                list.appendChild(empty);
+                return;
+            }
+            history.forEach(chat => {
+                const item = document.createElement('div');
+                item.className = 'history-item';
+                item.style.display = 'flex';
+                item.style.justifyContent = 'space-between';
+                item.style.alignItems = 'center';
+
+                const nameSpan = document.createElement('span');
+                nameSpan.innerText = chat.name;
+                nameSpan.style.flex = '1';
+                nameSpan.style.cursor = 'pointer';
+                nameSpan.onclick = () => {
+                    loadChat(chat.id);
+                    toggleDropdown(false);
+                };
+
+                const deleteBtn = document.createElement('button');
+                deleteBtn.title = 'Delete chat';
+                deleteBtn.className = 'icon-btn';
+                deleteBtn.style.marginLeft = '8px';
+                deleteBtn.innerHTML = `
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                        <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m2 0v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6h16zM10 11v6M14 11v6" stroke="#1976d2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                `;
+                deleteBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    deleteChat(chat.id);
+                };
+
+                item.appendChild(nameSpan);
+                item.appendChild(deleteBtn);
+                list.appendChild(item);
+            });
+        }
+
+        function deleteChat(chatId) {
+            let history = JSON.parse(localStorage.getItem('ollama_chat_history') || '[]');
+            history = history.filter(c => c.id !== chatId);
+            localStorage.setItem('ollama_chat_history', JSON.stringify(history));
+            loadChatHistory();
+        }
+
+        function loadChat(chatId) {
+            const history = JSON.parse(localStorage.getItem('ollama_chat_history') || '[]');
+            const chat = history.find(c => c.id === chatId);
+            if (!chat) return;
+            currentChat = chat.messages.slice();
+            const chatBox = document.getElementById('chatMessages');
+            chatBox.innerHTML = '';
+            currentChat.forEach(msg => appendMessage(msg.text, msg.sender));
+            scrollToBottom();
+        }
+
+        function toggleDropdown(forceState) {
+            const dropdown = document.getElementById('historyList');
+            if (forceState === undefined) {
+                dropdown.classList.toggle('show');
+            } else {
+                dropdown.classList[forceState ? 'add' : 'remove']('show');
+            }
+        }
+
+        window.onload = function() {
+            document.getElementById('chatInput').addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') sendMessage();
+            });
+            document.getElementById('sendBtn').addEventListener('click', sendMessage);
+            document.getElementById('saveBtn').addEventListener('click', saveChat);
+            document.getElementById('historyBtn').addEventListener('click', function(e) {
+                toggleDropdown();
+                e.stopPropagation();
+            });
+            loadChatHistory();
+            document.addEventListener('click', function() {
+                toggleDropdown(false);
+            });
+            document.getElementById('historyList').addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+
+            // write a welcome message to the chat window
+            const initialMessage = 'Welcome to Ollama Chat! How may I help you today?';
+            appendMessage(initialMessage, 'ollama');
+            currentChat.push({ text: initialMessage, sender: 'ollama' });
+            scrollToBottom();
+        }
+    </script>
+</head>
+<body>
+<div class="chat-container">
+    <div class="chat-header">
+        <!-- Inside .chat-header -->
+        <div class="history-dropdown">
+            <button class="icon-btn" id="historyBtn" aria-label="Chat History">
+                <!-- History (menu) icon SVG -->
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                    <rect y="4" width="24" height="2" rx="1" fill="#1976d2"/>
+                    <rect y="11" width="24" height="2" rx="1" fill="#1976d2"/>
+                    <rect y="18" width="24" height="2" rx="1" fill="#1976d2"/>
+                </svg>
+                <span class="tooltip">Chat History</span>
+            </button>
+            <div class="history-list" id="historyList"></div>
+        </div>
+        <span class="header-title">Ollama Chat</span>
+        <button class="icon-btn" id="saveBtn" aria-label="Save Chat">
+            <!-- Save (floppy disk) icon SVG -->
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                <path d="M17 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V7l-4-4zM12 19a3 3 0 1 1 0-6 3 3 0 0 1 0 6zm2-10H6V5h8v4z"
+                      fill="#1976d2"/>
+            </svg>
+            <span class="tooltip">Save Chat</span>
+        </button>
+    </div>
+    <div class="chat-messages" id="chatMessages"></div>
+    <div class="chat-input-area">
+        <input type="text" id="chatInput" class="chat-input" placeholder="Type your message..." autocomplete="off"/>
+        <button id="sendBtn" class="send-btn">Send</button>
+    </div>
+</div>
+<div id="chatNameModal" class="modal-overlay" style="display:none;">
+    <div class="modal-content">
+        <h3>Name your chat (optional)</h3>
+        <input id="chatNameInput" type="text" placeholder="Enter chat name..."/>
+        <div class="modal-actions">
+            <button id="chatNameCancel">Cancel</button>
+            <button id="chatNameSave">Save</button>
+        </div>
+    </div>
+</div>
+</body>
+</html>
