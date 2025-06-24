@@ -22,17 +22,15 @@ public class OpenAIController {
     @Autowired
     private OpenAIService openAIService;
 
-
     @GetMapping(path = "/ask_ollama/{question}", produces = "application/json")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public String getAnswerUsingOllama(@PathVariable("question") String question) throws InterruptedException {
-        Thread.sleep(1000); // Simulate delay for testing purposes
         return openAIService.getAnswerUsingOllama(question);
     }
 
     @GetMapping(path = "/ask_ollama_json/{question}", produces = "application/json")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public Map getAnswerUsingOllamaJSON(@PathVariable("question") String question){
+    public Map getAnswerUsingOllamaJSON(@PathVariable("question") String question) {
         Map response = openAIService.getAnswerUsingOllamaJSON(question);
         return response;
     }
@@ -66,21 +64,16 @@ public class OpenAIController {
             try {
                 Thread.sleep(5000); // Wait for download to start
                 tempFile.delete();
-            } catch (InterruptedException ignored) {}
+            } catch (InterruptedException ignored) {
+            }
         }).start();
 
         return entity;
     }
 
-//    @GetMapping("/ask_openai")
-//    @ResponseStatus(HttpStatus.ACCEPTED)
-//    public String askQuestion(){
-//        return openAIService.getAnswerUsingOpenAI(null);
-//    }
-
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public String healthCheck(){
+    public String healthCheck() {
         return "Healthy";
     }
 
