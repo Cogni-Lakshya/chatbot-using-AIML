@@ -1,11 +1,13 @@
 {
     "jobConfiguration": {
+        "modalName": "<modal_name>",
         "jobName": "aggregrate_test",
         "jobDescription": "Job for R4b file name aggregrate",
         "areJobAlertsSuppressed": false,
         "exchangeTeamId": "fd23s-382d-2830-980983c00f",
         "summary": "<short summary>",
-        "keywords": ["<keyword1>", "<keyword2>"]
+        "keywords": ["<keyword1>", "<keyword2>"],
+        "detailedSummary": "<detailed summary>"
     },
     "dataset": {
         "catalogDatasetId": "b309800a-aj28-8w24-98987f0809",

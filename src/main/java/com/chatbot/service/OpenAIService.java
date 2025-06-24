@@ -28,7 +28,6 @@ public class OpenAIService{
         ChatResponse response = chatModel.call(prompt);
         AssistantMessage message = response.getResult().getOutput();
         return message.getText();
-
     }
 
     public Map<String, Object> getAnswerUsingOllamaJSON(String question){
@@ -44,7 +43,7 @@ public class OpenAIService{
 
         // Construct the prompt for Ollama
         String promptString = """
-            Please analyze the following text and return a response in the exact JSON format below, without any extra explanation.
+            Please analyze the following text and return a response in the exact JSON format below and update your explanation in place of <short summary> & <detailed summary> in json.
 
             JSON format:
             %s
