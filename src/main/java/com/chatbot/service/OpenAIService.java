@@ -3,6 +3,7 @@ package com.chatbot.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.ai.chat.messages.AssistantMessage;
+import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
@@ -10,10 +11,14 @@ import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -22,10 +27,46 @@ public class OpenAIService {
     @Autowired
     private ChatModel chatModel;
 
+    // Store conversation history
+    private final List<Message> history = new ArrayList<>();
+
     public String getAnswerUsingOllama(String question) {
-        PromptTemplate template = new PromptTemplate(question);
-        Prompt prompt = template.create();
+        // Add user message to history
+        UserMessage userMessage = new UserMessage(question);
+        history.add(userMessage);
+
+        // Build prompt from history
+        Prompt prompt = new Prompt(new ArrayList<>(history));
         ChatResponse response = chatModel.call(prompt);
+
+        // Add assistant response to history
+        AssistantMessage message = response.getResult().getOutput();
+        history.add(message);
+
+        return message.getText();
+    }
+
+    public String getAnswerFromOllamaUsingModelTemplate(String question) {
+        // Load the prompt template from resources
+        PromptTemplate promptTemplate = PromptTemplate.builder()
+                .resource(new ClassPathResource("ollama_template.json"))
+                .build();
+
+        // Define default values for placeholders
+        Map<String, Object> defaultValues = new HashMap<>();
+        defaultValues.put("modal_name", "DefaultModal");
+        defaultValues.put("job_name", "DefaultJob");
+        defaultValues.put("job_description", "No description provided");
+        // ... add defaults for all placeholders
+
+        // Create a prompt using the template and the question
+        Prompt prompt = promptTemplate.create(defaultValues);
+        prompt.augmentUserMessage(question);
+
+        // Call the chat model with the constructed prompt
+        ChatResponse response = chatModel.call(prompt);
+
+        // Extract the assistant message from the response
         AssistantMessage message = response.getResult().getOutput();
         return message.getText();
     }
